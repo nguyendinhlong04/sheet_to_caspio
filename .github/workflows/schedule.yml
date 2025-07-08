@@ -3,7 +3,7 @@ name: Sheets to Caspio Transfer
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/5 * * * *'  
+    - cron: '*/5 * * * *'
 
 jobs:
   transfer:
@@ -23,15 +23,21 @@ jobs:
 
       - name: Set up Google credentials
         run: |
-          echo "${{ secrets.GOOGLE_CREDENTIALS }}" > src/google-credentials.json
+          mkdir -p src
+          printf '%s' "${GOOGLE_CREDENTIALS}" > src/google-credentials.json
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+      - name: Check credentials content (debug)
+        run: cat src/google-credentials.json
 
       - name: Run transfer script
         env:
           CASPIO_ACCOUNT_ID: ${{ secrets.CASPIO_ACCOUNT_ID }}
           CASPIO_CLIENT_ID: ${{ secrets.CASPIO_CLIENT_ID }}
           CASPIO_CLIENT_SECRET: ${{ secrets.CASPIO_CLIENT_SECRET }}
-          TABLE_NAME: ${{ vars.CASPIO_TABLE_NAME }}
+          CASPIO_TABLE_NAME: ${{ secrets.CASPIO_TABLE_NAME }}
           SHEET_URL: ${{ secrets.SHEET_URL }}
-          WORKSHEET_NAME: ${{ vars.WORKSHEET_NAME }}
+          WORKSHEET_NAME: ${{ secrets.WORKSHEET_NAME }}
         run: |
           python -m src.sheet_caspio
