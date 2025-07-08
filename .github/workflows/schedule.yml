@@ -2,8 +2,8 @@ name: Sheets to Caspio Transfer
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '*/5 * * * *'
+  # schedule:
+  #   - cron: '*/5 * * * *'
 
 jobs:
   transfer:
