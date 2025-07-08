@@ -120,6 +120,8 @@ class GoogleSheetsCaspioTransfer:
         if account_id.endswith('.caspio.com'):
             account_id = account_id.replace('.caspio.com', '')
         api_url = f"https://{account_id}.caspio.com/rest/v2/tables/{self.caspio_config['table_name']}/records"
+        print("DEBUG POST URL:", api_url)
+        print("DEBUG TABLE NAME:", self.caspio_config['table_name'])
         headers_http = {
             'Authorization': f'Bearer {self.caspio_token}',
             'Content-Type': 'application/json'
