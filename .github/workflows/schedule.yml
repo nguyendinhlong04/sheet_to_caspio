@@ -36,4 +36,4 @@ jobs:
           SHEET_URL: ${{ secrets.SHEET_URL }}
           WORKSHEET_NAME: ${{ secrets.WORKSHEET_NAME }}
         run: |
-          python sheet_caspio.py
+          python -m src.sheet_caspio
