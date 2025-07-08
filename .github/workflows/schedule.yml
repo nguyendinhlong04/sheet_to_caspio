@@ -1,0 +1,30 @@
+name: GoogleSheet-Caspio Sync
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      CASPIO_ACCOUNT:       ${{ secrets.CASPIO_ACCOUNT_ID }}
+      CASPIO_CLIENT_ID:     ${{ secrets.CASPIO_CLIENT_ID }}
+      CASPIO_CLIENT_SECRET: ${{ secrets.CASPIO_CLIENT_SECRET }}
+      CASPIO_TABLE:         ${{ vars.CASPIO_TABLE_NAME }}
+      GSHEET_URL:           ${{ secrets.SHEET_URL }}
+      GSHEET_TAB:           ${{ vars.WORKSHEET_NAME }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Run transfer
+        run: python -m src.sheet_caspio
