@@ -36,8 +36,8 @@ jobs:
           CASPIO_ACCOUNT_ID: ${{ secrets.CASPIO_ACCOUNT_ID }}
           CASPIO_CLIENT_ID: ${{ secrets.CASPIO_CLIENT_ID }}
           CASPIO_CLIENT_SECRET: ${{ secrets.CASPIO_CLIENT_SECRET }}
-          CASPIO_TABLE_NAME: ${{ secrets.CASPIO_TABLE_NAME }}
+          CASPIO_TABLE_NAME: ${{ vars.CASPIO_TABLE_NAME }}
           SHEET_URL: ${{ secrets.SHEET_URL }}
-          WORKSHEET_NAME: ${{ secrets.WORKSHEET_NAME }}
+          WORKSHEET_NAME: ${{ vars.WORKSHEET_NAME }}
         run: |
           python -m src.sheet_caspio
