@@ -62,7 +62,7 @@ class GoogleSheetsCaspioTransfer:
 
     def find_tinh_trang_column(self, headers):
         for i, header in enumerate(headers):
-            if header.lower().strip() in ['TinhTrangCapNhat', 'Tinhtrangcapnhat', 'tinh_trang']:
+            if header.lower().strip() in ['TinhTrangCapNhat', 'tinhtrangcapnhat', 'tinh_trang_cap_nhat']:
                 return i
         return -1
 
@@ -89,10 +89,7 @@ class GoogleSheetsCaspioTransfer:
                 print("✗ No data found in the sheet")
                 return [], [], -1
             headers = all_data[0] if all_data else []
-            tinh_trang_col = 11 #self.find_tinh_trang_column(headers)
-            # if tinh_trang_col != 11:
-            #     print(f"❌ Error: 'TinhTrangCapNhat' column must be in column L (index 11), but found at index {tinh_trang_col}")
-            #     return [], [], -1
+            tinh_trang_col = 11 
             filtered_data = []
             for row_index, row in enumerate(all_data[1:], start=2):
                 while len(row) < len(headers):
