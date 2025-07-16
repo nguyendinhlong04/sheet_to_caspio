@@ -62,7 +62,7 @@ class GoogleSheetsCaspioTransfer:
 
     def find_tinh_trang_column(self, headers):
         for i, header in enumerate(headers):
-            if header.lower().strip() in ['tinh trang', 'tình trạng', 'tinh_trang']:
+            if header.lower().strip() in ['TinhTrangCapNhat', 'Tinhtrangcapnhat', 'tinh_trang']:
                 return i
         return -1
 
@@ -89,10 +89,10 @@ class GoogleSheetsCaspioTransfer:
                 print("✗ No data found in the sheet")
                 return [], [], -1
             headers = all_data[0] if all_data else []
-            tinh_trang_col = self.find_tinh_trang_column(headers)
-            if tinh_trang_col != 10:
-                print(f"❌ Error: 'tinh trang' column must be in column K (index 10), but found at index {tinh_trang_col}")
-                return [], [], -1
+            tinh_trang_col = 11 #self.find_tinh_trang_column(headers)
+            # if tinh_trang_col != 11:
+            #     print(f"❌ Error: 'TinhTrangCapNhat' column must be in column L (index 11), but found at index {tinh_trang_col}")
+            #     return [], [], -1
             filtered_data = []
             for row_index, row in enumerate(all_data[1:], start=2):
                 while len(row) < len(headers):
@@ -176,17 +176,17 @@ class GoogleSheetsCaspioTransfer:
             for transfer in successful_transfers:
                 row_number = transfer['row_number']
                 tinh_trang_col = transfer['tinh_trang_col']
-                if tinh_trang_col != 10:
-                    print(f"❌ Error: 'tinh trang' column for row {row_number} is not in column K (index 10)")
+                if tinh_trang_col != 11:
+                    print(f"❌ Error: 'TinhTrangCapNhat' column for row {row_number} is not in column L (index 11)")
                     continue
                 tinh_trang_col_num = tinh_trang_col + 1
                 try:
                     worksheet.update_cell(row_number, tinh_trang_col_num, "Copied")
-                    print(f"   ✅ Row {row_number}, Column K set to 'Copied'")
+                    print(f"   ✅ Row {row_number}, Column L set to 'Copied'")
                 except Exception as e:
                     print(f"   ❌ Error updating row {row_number}: {e}")
                 time.sleep(0.5)
-            print(f"✅ Successfully updated {len(successful_transfers)} rows in 'tinh trang' column")
+            print(f"✅ Successfully updated {len(successful_transfers)} rows in 'TinhTrangCapNhat' column")
         except Exception as e:
             print(f"❌ Error updating Google Sheet: {e}")
 
@@ -201,7 +201,7 @@ class GoogleSheetsCaspioTransfer:
         print("\n📊 Reading Google Sheet data...")
         data_rows, headers, tinh_trang_col = self.read_google_sheet(sheet_url, worksheet_name)
         if not data_rows:
-            print("ℹ️ No data to transfer (all rows in 'tinh trang' column have values or no valid data)")
+            print("ℹ️ No data to transfer (all rows in 'TinhTrangCapNhat' column have values or no valid data)")
             return True
         print(f"\n🔄 Transferring {len(data_rows)} rows to Caspio...")
         successful_transfers = self.send_to_caspio(data_rows, field_mappings, headers)
@@ -231,25 +231,26 @@ def main():
         'account_id': os.getenv('CASPIO_ACCOUNT_ID', 'xxxxxxxx'),
         'client_id': os.getenv('CASPIO_CLIENT_ID', '3963d7eb1c12422535eee4626c725879e9cexxxxxxxxxx'),
         'client_secret': os.getenv('CASPIO_CLIENT_SECRET', '175b6ea752db43c98304ebba83db515d0xxxxxxxxxx'),
-        'table_name': os.getenv('CASPIO_TABLE_NAME', 'Dulieu_Tin_Nhan')
+        'table_name': os.getenv('CASPIO_TABLE_NAME', 'dataQC')
     }
     google_credentials_path = os.path.join(os.path.dirname(__file__), 'google-credentials.json')
 
     field_mappings = {
-        0: 'ID_tro_chuyen',
-        1: 'Ho_ten',
-        2: 'Gioi_Tinh',
-        3: 'Nguon',
+        0: 'PSID',
+        1: 'HO_TEN',
+        2: 'GIOI_TINH',
+        3: 'NGUON',
         4: 'SDT',
-        5: 'Ten_trang',
-        6: 'Time',
+        5: 'TENTRANG',
+        6: 'ID_Page',
         7: 'IDQC',
         8: 'tin_nhan',
-        9: 'Ngon_ngu'
+        9: 'NgonNgu',
+        10: 'ChiNhanh'
     }
 
     sheet_url = os.getenv('SHEET_URL', 'https://docs.google.com/spreadsheets/d/1qYyC6rjohX1S14sYkgJXdoQqcCUEnkJ4N0Lwshi6-9A/edit#gid=xxxxxx')
-    worksheet_name = os.getenv('WORKSHEET_NAME', 'Dữ liệu tin nhắn')
+    worksheet_name = os.getenv('WORKSHEET_NAME', 'Update')
 
     transfer = GoogleSheetsCaspioTransfer(caspio_config, google_credentials_path)
     transfer.transfer_data(sheet_url, worksheet_name, field_mappings)
