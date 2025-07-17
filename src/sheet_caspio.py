@@ -1,9 +1,7 @@
 import gspread
 import requests
-import json
 import time
 import os
-from datetime import datetime
 from oauth2client.service_account import ServiceAccountCredentials
 
 try:
@@ -62,7 +60,7 @@ class GoogleSheetsCaspioTransfer:
 
     def find_tinh_trang_column(self, headers):
         for i, header in enumerate(headers):
-            if header.lower().strip() in ['TinhTrangCapNhat', 'tinhtrangcapnhat', 'tinh_trang_cap_nhat']:
+            if header.lower().strip() in ['TT Updata', 'TT_updata']:
                 return i
         return -1
 
@@ -89,7 +87,7 @@ class GoogleSheetsCaspioTransfer:
                 print("✗ No data found in the sheet")
                 return [], [], -1
             headers = all_data[0] if all_data else []
-            tinh_trang_col = 11 
+            tinh_trang_col = 12
             filtered_data = []
             for row_index, row in enumerate(all_data[1:], start=2):
                 while len(row) < len(headers):
@@ -173,8 +171,8 @@ class GoogleSheetsCaspioTransfer:
             for transfer in successful_transfers:
                 row_number = transfer['row_number']
                 tinh_trang_col = transfer['tinh_trang_col']
-                if tinh_trang_col != 11:
-                    print(f"❌ Error: 'TinhTrangCapNhat' column for row {row_number} is not in column L (index 11)")
+                if tinh_trang_col != 12:
+                    print(f"❌ Error: 'TT Updata' column for row {row_number} is not in column M (index 12)")
                     continue
                 tinh_trang_col_num = tinh_trang_col + 1
                 try:
@@ -183,7 +181,7 @@ class GoogleSheetsCaspioTransfer:
                 except Exception as e:
                     print(f"   ❌ Error updating row {row_number}: {e}")
                 time.sleep(0.5)
-            print(f"✅ Successfully updated {len(successful_transfers)} rows in 'TinhTrangCapNhat' column")
+            print(f"✅ Successfully updated {len(successful_transfers)} rows in 'TT Updata' column")
         except Exception as e:
             print(f"❌ Error updating Google Sheet: {e}")
 
@@ -198,7 +196,7 @@ class GoogleSheetsCaspioTransfer:
         print("\n📊 Reading Google Sheet data...")
         data_rows, headers, tinh_trang_col = self.read_google_sheet(sheet_url, worksheet_name)
         if not data_rows:
-            print("ℹ️ No data to transfer (all rows in 'TinhTrangCapNhat' column have values or no valid data)")
+            print("ℹ️ No data to transfer (all rows in 'TT Updata' column have values or no valid data)")
             return True
         print(f"\n🔄 Transferring {len(data_rows)} rows to Caspio...")
         successful_transfers = self.send_to_caspio(data_rows, field_mappings, headers)
@@ -216,9 +214,6 @@ class GoogleSheetsCaspioTransfer:
             print(f"\n✅ Transfer completed successfully!")
             print(f"✅ {len(successful_transfers)} rows transferred to Caspio")
             print(f"✅ Google Sheet update attempted for {len(successful_transfers)} rows")
-            print(f"\n📋 Successfully transferred records:")
-            for transfer in successful_transfers:
-                print(f"   • Row {transfer['row_number']}: {transfer['record']}")
         else:
             print(f"\n❌ No data was successfully transferred")
         return len(successful_transfers) > 0
@@ -240,14 +235,15 @@ def main():
         4: 'SDT',
         5: 'TENTRANG',
         6: 'ID_Page',
-        7: 'IDQC',
-        8: 'tin_nhan',
-        9: 'NgonNgu',
-        10: 'ChiNhanh'
+        7: 'thoigian',
+        8: 'IDQC',
+        9: 'tin_nhan',
+        10: 'NgonNgu',
+        11: 'ChiNhanh'
     }
 
     sheet_url = os.getenv('SHEET_URL', 'https://docs.google.com/spreadsheets/d/1qYyC6rjohX1S14sYkgJXdoQqcCUEnkJ4N0Lwshi6-9A/edit#gid=xxxxxx')
-    worksheet_name = os.getenv('WORKSHEET_NAME', 'Update')
+    worksheet_name = os.getenv('WORKSHEET_NAME', 'Fanpage')
 
     transfer = GoogleSheetsCaspioTransfer(caspio_config, google_credentials_path)
     transfer.transfer_data(sheet_url, worksheet_name, field_mappings)
